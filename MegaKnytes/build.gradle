@@ -1,0 +1,41 @@
+plugins{
+    id 'maven-publish'
+    id 'com.android.library'
+}
+
+dependencies {
+    compileOnly 'org.firstinspires.ftc:Inspection:8.2.0'
+    compileOnly 'org.firstinspires.ftc:RobotCore:8.2.0'
+    compileOnly 'org.firstinspires.ftc:RobotServer:8.2.0'
+    compileOnly 'org.firstinspires.ftc:Hardware:8.2.0'
+    compileOnly 'org.firstinspires.ftc:FtcCommon:8.2.0'
+    compileOnly 'org.openftc:easyopencv:1.7.0'
+}
+
+android {
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 34
+        versionCode 1
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = 'com.MegaKnytes'
+                artifactId = 'MegaKnytes'
+                version = '1.0.0'
+                afterEvaluate {
+                    from components.release
+                }
+            }
+        }
+    }
+}
