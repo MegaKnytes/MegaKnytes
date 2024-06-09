@@ -1,1 +1,0 @@
-npx expo export -p web --output-dir ../src/main/assets/editor && cd ../src/main/assets/editor && mv _expo expo && grep -rl '/_expo' * | xargs sed -i 's|/_expo|/expo|g'

@@ -1,26 +1,39 @@
 {
   "name": "editor",
-  "version": "1.0.0",
-  "main": "expo/AppEntry.js",
-  "homepage": "/editor",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "http://192.168.43.1:8080/editor",
   "dependencies": {
-    "@expo/metro-runtime": "~3.2.1",
-    "expo": "~51.0.9",
-    "expo-router": "^3.5.14",
-    "expo-status-bar": "~1.12.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-native": "0.74.1",
-    "react-native-web": "~0.19.10"
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.0"
   },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "private": true
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
