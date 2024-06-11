@@ -1,0 +1,13 @@
+.battery-indicator {
+    display: flex;
+    align-items: center;
+    color: black;
+    margin-right: 10px;
+    border: black 1px solid;
+    padding: 5px;
+    border-radius: 10px;
+    height: min-content;
+    background-color: aliceblue;
+    justify-self: flex-end;
+    margin-left: auto;
+}

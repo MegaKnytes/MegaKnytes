@@ -15,12 +15,15 @@ import fi.iki.elonen.NanoHTTPD;
 public class webAssetHandler {
 
     public static WebHandler fileWebHandler(AssetManager assetManager, String fileName){
-        return session -> {
-            if(session.getMethod() == NanoHTTPD.Method.GET){
-                return NanoHTTPD.newChunkedResponse(NanoHTTPD.Response.Status.OK, MimeTypesUtil.determineMimeType(fileName), assetManager.open(fileName));
-            } else {
-                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED,
-                        NanoHTTPD.MIME_PLAINTEXT, "");
+        return new WebHandler() {
+            @Override
+            public NanoHTTPD.Response getResponse(NanoHTTPD.IHTTPSession session) throws IOException{
+                if(session.getMethod() == NanoHTTPD.Method.GET){
+                    return NanoHTTPD.newChunkedResponse(NanoHTTPD.Response.Status.OK, MimeTypesUtil.determineMimeType(fileName), assetManager.open(fileName));
+                } else {
+                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED,
+                            NanoHTTPD.MIME_PLAINTEXT, "");
+                }
             }
         };
     }
@@ -28,7 +31,7 @@ public class webAssetHandler {
     public static void directoryWebHandler(AssetManager assetManager, String folderName){
         try {
             String[] list = assetManager.list(folderName);
-            System.out.println(list);
+
             if (list == null) {
                 return;
             }
@@ -36,11 +39,9 @@ public class webAssetHandler {
             if (list.length > 0) {
                 for (String file : list) {
                     fileWebHandler(assetManager, folderName + "/" + file);
-                    System.out.println(folderName + "/" + file);
                 }
             } else {
                 fileWebHandler(assetManager, '/'+ folderName);
-                System.out.println('/'+ folderName);
             }
         } catch (IOException e) {
         }

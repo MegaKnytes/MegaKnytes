@@ -51,7 +51,7 @@ tasks.register('generateStaticBuild', NpxTask) {
     dependsOn npmInstall
     command = 'react-scripts'
     args = ['build']
-    inputs.files('package.json', 'package-lock.json')
+    inputs.files('editor/package.json', 'editor/package-lock.json')
     inputs.dir("editor/public")
     inputs.dir("editor/src")
     inputs.dir(fileTree("editor/node_modules").exclude(".cache"))
