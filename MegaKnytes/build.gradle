@@ -1,29 +1,32 @@
 plugins{
     id 'maven-publish'
     id 'com.android.library'
+    id("com.github.node-gradle.node") version "7.0.2"
 }
 
 dependencies {
-    compileOnly 'org.firstinspires.ftc:Inspection:8.2.0'
-    compileOnly 'org.firstinspires.ftc:RobotCore:8.2.0'
-    compileOnly 'org.firstinspires.ftc:RobotServer:8.2.0'
-    compileOnly 'org.firstinspires.ftc:Hardware:8.2.0'
-    compileOnly 'org.firstinspires.ftc:FtcCommon:8.2.0'
-    compileOnly 'org.openftc:easyopencv:1.7.0'
+    api 'org.firstinspires.ftc:RobotCore:9.1.0'
+    api 'org.firstinspires.ftc:RobotServer:9.1.0'
+    api 'org.firstinspires.ftc:Hardware:9.1.0'
+    api 'org.firstinspires.ftc:FtcCommon:9.1.0'
+
+    api 'org.openftc:easyopencv:1.7.2'
+
+    implementation("org.nanohttpd:nanohttpd-websocket:2.3.1") {
+        exclude module: "nanohttpd"
+    }
 }
+
 
 android {
     compileSdkVersion 34
-
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 34
         versionCode 1
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        aaptOptions {
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!_*'
+        }
     }
 
     publishing {
@@ -39,3 +42,20 @@ android {
         }
     }
 }
+
+node {
+    nodeProjectDir = file("editor")
+}
+
+tasks.register('generateStaticBuild', NpxTask) {
+    dependsOn npmInstall
+    command = 'react-scripts'
+    args = ['build']
+    inputs.files('package.json', 'package-lock.json')
+    inputs.dir("editor/public")
+    inputs.dir("editor/src")
+    inputs.dir(fileTree("editor/node_modules").exclude(".cache"))
+    outputs.dir('src/main/assets/editor')
+}
+
+publishToMavenLocal.dependsOn(generateStaticBuild)
