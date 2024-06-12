@@ -1,12 +1,15 @@
-import "./styles/App.css";
-import Header from "./ui/Header.js";
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Header from "./ui/Header";
+import SideNav from "./ui/SideNav";
+import FileView from "./ui/FileView";
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
+    <Box sx={{ display: "flex" }}>
       <Header />
-    </div>
+      <SideNav />
+      <FileView />
+    </Box>
   );
 }
-
-export default App;
