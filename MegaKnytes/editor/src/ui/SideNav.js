@@ -29,7 +29,7 @@ export default function SideNav() {
       <Box sx={{ overflow: "auto" }}>
         <List>
           <ListItem key="My Files">
-            <ListItemButton>
+            <ListItemButton selected={true}>
               <ListItemIcon>
                 <SourceRoundedIcon />
               </ListItemIcon>

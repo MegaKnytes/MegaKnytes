@@ -3,31 +3,9 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import "../styles/FileView.css";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-
-const fileCard = (
-  <React.Fragment>
-    <CardContent>
-      <Typography variant="h6" component="div">
-        {"[File Name]"}
-      </Typography>
-      <Typography variant="h8" component="div">
-        Last Edited: June 6th @ 11:13pm | # states
-      </Typography>
-    </CardContent>
-  </React.Fragment>
-);
-
-const cardPaperStyle = {
-  backgroundColor: "grey",
-  color: "white",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
+import FileCard from "./FileCard";
 
 export default function FileView() {
   return (
@@ -49,21 +27,13 @@ export default function FileView() {
       </Box>
       <Box className="FileView">
         <Box className="card-container">
-          <Card className="card" sx={cardPaperStyle}>
-            {fileCard}
-          </Card>
-          <Card className="card" sx={cardPaperStyle}>
-            {fileCard}
-          </Card>
-          <Card className="card" sx={cardPaperStyle}>
-            {fileCard}
-          </Card>
-          <Card className="card" sx={cardPaperStyle}>
-            {fileCard}
-          </Card>
-          <Card className="card" sx={cardPaperStyle}>
-            {fileCard}
-          </Card>
+          {Array.from({ length: 16 }).map((_, index) => (
+            <FileCard
+              fileName="test"
+              editDate="June 12 @ 11:32pm"
+              countStates={index}
+            />
+          ))}
         </Box>
       </Box>
     </Box>

@@ -1,69 +1,71 @@
 package com.MegaKnytes.DecisionTable.editor;
 
+import static com.MegaKnytes.DecisionTable.editor.WebFileHandler.handleUpload;
+import static com.MegaKnytes.DecisionTable.editor.WebServerHandler.bindWebServer;
+
 import android.content.Context;
-import android.content.res.AssetManager;
 
 import com.qualcomm.ftccommon.FtcEventLoop;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import com.qualcomm.robotcore.util.WebHandlerManager;
 
-import org.MegaKnytes.DecisionTables.R;
-import org.firstinspires.ftc.ftccommon.external.OnCreate;
 import org.firstinspires.ftc.ftccommon.external.OnCreateEventLoop;
+import org.firstinspires.ftc.ftccommon.external.OnDestroy;
 import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
-import org.firstinspires.ftc.ftccommon.internal.manualcontrol.ManualControlOpMode;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.robotcore.internal.webserver.websockets.FtcWebSocket;
-import org.firstinspires.ftc.robotcore.internal.webserver.websockets.FtcWebSocketMessage;
-import org.firstinspires.ftc.robotcore.internal.webserver.websockets.WebSocketManager;
-import org.firstinspires.ftc.robotcore.internal.webserver.websockets.WebSocketMessageTypeHandler;
-import org.firstinspires.ftc.robotcore.internal.webserver.websockets.WebSocketNamespaceHandler;
-import org.java_websocket.WebSocketAdapter;
-import org.java_websocket.WebSocketFactory;
-import org.java_websocket.WebSocketListener;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
 
 public class DTPEditor {
+    private FtcEventLoop eventLoop;
+    private final NanoWSD server;
 
-    @WebHandlerRegistrar
-    public static void bindWebHandler(Context context, WebHandlerManager manager) throws InterruptedException {
-        AssetManager assetManager = AppUtil.getInstance().getActivity().getAssets();
-        manager.register("/editor", webAssetHandler.fileWebHandler(assetManager, "editor/index.html"));
-        webAssetHandler.directoryWebHandler(assetManager, "editor");
-        WebSocketNamespaceHandler webSocketNamespaceHandler = new WebSocketNamespaceHandler("editor") {
+    private static final Logger LOGGER = Logger.getLogger(DTPEditor.class.getName());
+
+    public DTPEditor(Context context) {
+        server = new NanoWSD(11093) {
             @Override
-            protected void registerMessageTypeHandlers(Map<String, WebSocketMessageTypeHandler> messageTypeHandlerMap) {
-                super.registerMessageTypeHandlers(messageTypeHandlerMap);
+            protected WebSocket openWebSocket(NanoHTTPD.IHTTPSession handshake) {
+                return new EditorWebSocket(handshake, eventLoop);
             }
 
             @Override
-            public boolean onMessage(FtcWebSocketMessage message, FtcWebSocket webSocket) {
-                super.onMessage(message, webSocket);
-                System.out.println("MESSAGE RECIEVED: " + message.toString());
-                return true;
-            }
-
-            @Override
-            public void onSubscribe(FtcWebSocket webSocket) {
-                super.onSubscribe(webSocket);
-            }
-
-            @Override
-            public void onUnsubscribe(FtcWebSocket webSocket) {
-                super.onUnsubscribe(webSocket);
+            public Response serveHttp(IHTTPSession session) {
+                if (session.getMethod() == Method.POST && session.getUri().equals("/file/upload")) {
+                    return handleUpload(session, context);
+                } else if (session.getMethod() == Method.GET && session.getUri().equals("/file/list")) {
+                    return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, MIME_PLAINTEXT,
+                            Arrays.toString(context.fileList()));
+                } else {
+                    return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Method not allowed");
+                }
             }
         };
-        manager.getWebServer().getWebSocketManager().registerNamespaceHandler(webSocketNamespaceHandler);
     }
 
+    @WebHandlerRegistrar
+    public static void attachWebUI(Context context, WebHandlerManager manager) {
+        bindWebServer(context, manager);
+    }
 
+    @OnCreateEventLoop
+    public static void start(Context context, FtcEventLoop eventLoop){
+        DTPEditor instance = new DTPEditor(context);
+        instance.eventLoop = eventLoop;
+        try {
+            instance.server.start(-1);
+            LOGGER.log(Level.INFO, "Websocket handler started on port " + instance.server.getListeningPort());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error starting websocket handler", e);
+        }
+    }
+
+    @OnDestroy
+    public static void stop(){
+        LOGGER.log(Level.INFO, "Websocket handler stopped");
+    }
 }
-
