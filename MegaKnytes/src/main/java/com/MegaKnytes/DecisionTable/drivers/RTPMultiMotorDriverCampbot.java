@@ -1,9 +1,10 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+import com.MegaKnytes.DecisionTable.editor.Driver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-
+@Driver
 public class RTPMultiMotorDriverCampbot {
 
 

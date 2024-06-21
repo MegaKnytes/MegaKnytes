@@ -1,5 +1,6 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+import com.MegaKnytes.DecisionTable.editor.Driver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -8,6 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Each driver will consist of basically the same functions, however, how you process the inputs provided
  * can make each driver very unique.
  */
+
+@Driver
 public class MultiMotorDriver {
 
     // number of IO entries for this driver

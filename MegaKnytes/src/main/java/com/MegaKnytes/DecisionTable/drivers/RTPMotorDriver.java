@@ -1,5 +1,6 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+import com.MegaKnytes.DecisionTable.editor.Driver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -7,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * FTPMotorDriver is provided as a simple example of adding a device driver for the decision table processor.
  * This driver will initialize a DCMotor in RUN_TO_POSITION mode.
  */
+
+@Driver
 public class RTPMotorDriver {
 
     static final double VELOCITY = 2000.0;

@@ -1,5 +1,9 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+
+import com.MegaKnytes.DecisionTable.editor.Driver;
+
+@Driver
 public class TimerClass {
     int numTimers;
     long[] Timers;
@@ -17,7 +21,7 @@ public class TimerClass {
 
     public double get(int channel) {
         if ((channel >= 0) && (channel < numTimers)) {
-            if (System.currentTimeMillis() < (long) Timers[channel]) {
+            if (System.currentTimeMillis() < Timers[channel]) {
                 return (1.0);
             } else {
                 return (0.0);

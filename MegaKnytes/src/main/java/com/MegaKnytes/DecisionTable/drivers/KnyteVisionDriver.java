@@ -1,5 +1,6 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+import com.MegaKnytes.DecisionTable.editor.Driver;
 import com.MegaKnytes.KnyteVision.ImageClass;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -11,6 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+@Driver
 public class KnyteVisionDriver {
 
     static final int STREAM_WIDTH = 1920; // modify for your camera

@@ -13,23 +13,25 @@ import org.firstinspires.ftc.ftccommon.external.OnDestroy;
 import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
 
 public class DTPEditor {
-    private FtcEventLoop eventLoop;
-    private final NanoWSD server;
-
     private static final Logger LOGGER = Logger.getLogger(DTPEditor.class.getName());
+
+    private static DTPEditor instance;
+    private final NanoWSD server;
+    private ArrayList<Class<?>> driverClasses;
+    private FtcEventLoop eventLoop;
 
     public DTPEditor(Context context) {
         server = new NanoWSD(11093) {
             @Override
-            protected WebSocket openWebSocket(NanoHTTPD.IHTTPSession handshake) {
+            protected WebSocket openWebSocket(IHTTPSession handshake) {
                 return new EditorWebSocket(handshake, eventLoop);
             }
 
@@ -38,8 +40,11 @@ public class DTPEditor {
                 if (session.getMethod() == Method.POST && session.getUri().equals("/file/upload")) {
                     return handleUpload(session, context);
                 } else if (session.getMethod() == Method.GET && session.getUri().equals("/file/list")) {
-                    return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, MIME_PLAINTEXT,
+                    return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
                             Arrays.toString(context.fileList()));
+                } else if (session.getMethod() == Method.GET && session.getUri().equals("/drivers/list")) {
+                    return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
+                            driverClasses.toString());
                 } else {
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Method not allowed");
                 }
@@ -53,11 +58,14 @@ public class DTPEditor {
     }
 
     @OnCreateEventLoop
-    public static void start(Context context, FtcEventLoop eventLoop){
-        DTPEditor instance = new DTPEditor(context);
-        instance.eventLoop = eventLoop;
+    public static void start(Context context, FtcEventLoop eventLoop) {
+        if (instance == null) {
+            instance = new DTPEditor(context);
+            instance.eventLoop = eventLoop;
+            instance.driverClasses = DriverAnnotationProcessor.getClassesWithAnnotation(context);
+        }
         try {
-            instance.server.start(-1);
+            instance.server.start();
             LOGGER.log(Level.INFO, "Websocket handler started on port " + instance.server.getListeningPort());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error starting websocket handler", e);
@@ -65,7 +73,8 @@ public class DTPEditor {
     }
 
     @OnDestroy
-    public static void stop(){
+    public static void stop() {
+        instance.server.stop();
         LOGGER.log(Level.INFO, "Websocket handler stopped");
     }
 }

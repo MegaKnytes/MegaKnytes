@@ -30,10 +30,26 @@ public class EditorWebSocket extends NanoWSD.WebSocket{
     public EditorWebSocket(NanoHTTPD.IHTTPSession handshakeRequest, FtcEventLoop eventLoop) {
         super(handshakeRequest);
         this.eventLoop = eventLoop;
-        startPing();
+        startAlivePing();
+        startHeartbeat();
     }
 
-    private void startPing() {
+    private void startAlivePing() {
+        final Runnable ping = new Runnable() {
+            public void run() {
+                if(isOpen()){
+                    try {
+                        ping("".getBytes());
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, "Error sending ping", e);
+                    }
+                }
+            }
+        };
+        scheduler.scheduleWithFixedDelay(ping, 0, 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void startHeartbeat() {
         final Runnable ping = new Runnable() {
             VoltageSensor voltageSensor = eventLoop.getOpModeManager().getActiveOpMode().hardwareMap.voltageSensor.iterator().next();
             public void run() {
@@ -49,7 +65,7 @@ public class EditorWebSocket extends NanoWSD.WebSocket{
                 }
             }
         };
-        scheduler.scheduleWithFixedDelay(ping, 0, 500, TimeUnit.MILLISECONDS);
+        scheduler.scheduleWithFixedDelay(ping, 0, 5000, TimeUnit.MILLISECONDS);
     }
 
 

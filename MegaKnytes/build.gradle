@@ -21,6 +21,7 @@ dependencies {
     }
 
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation("jakarta.json:jakarta.json-api:2.1.3")
 }
 
 
@@ -63,6 +64,10 @@ tasks.register('generateStaticBuild', NpxTask) {
     inputs.dir("editor/src")
     inputs.dir(fileTree("editor/node_modules").exclude(".cache"))
     outputs.dir('src/main/assets/editor')
+}
+
+clean.doFirst {
+    file('src/main/assets/editor').deleteDir()
 }
 
 publishToMavenLocal.dependsOn(generateStaticBuild)

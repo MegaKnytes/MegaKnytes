@@ -1,7 +1,9 @@
 package com.MegaKnytes.DecisionTable.drivers;
 
+import com.MegaKnytes.DecisionTable.editor.Driver;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+@Driver
 public class GamepadDriver {
     int numGamePads;
 
@@ -59,17 +61,17 @@ public class GamepadDriver {
                 if (gp1.back) return (1.0);
                 break;
             case 13: // left_stick_x
-                return (double) gp1.left_stick_x;
+                return gp1.left_stick_x;
             case 14: // left_stick_y
-                return (double) gp1.left_stick_y;
+                return gp1.left_stick_y;
             case 15: // right_stick_x
-                return (double) gp1.right_stick_x;
+                return gp1.right_stick_x;
             case 16: // right_stick_y
-                return (double) gp1.right_stick_y;
+                return gp1.right_stick_y;
             case 17: // left_trigger
-                return (double) gp1.left_trigger;
+                return gp1.left_trigger;
             case 18: // right_trigger
-                return (double) gp1.right_trigger;
+                return gp1.right_trigger;
 
 // Gamepad 2
             case 20:  // A button
@@ -112,17 +114,17 @@ public class GamepadDriver {
                 if (gp2.back) return (1.0);
                 break;
             case 33: // left_stick_x
-                return (double) gp2.left_stick_x;
+                return gp2.left_stick_x;
             case 34: // left_stick_y
-                return (double) gp2.left_stick_y;
+                return gp2.left_stick_y;
             case 35: // right_stick_x
-                return (double) gp2.right_stick_x;
+                return gp2.right_stick_x;
             case 36: // right_stick_y
-                return (double) gp2.right_stick_y;
+                return gp2.right_stick_y;
             case 37: // left_trigger
-                return (double) gp2.left_trigger;
+                return gp2.left_trigger;
             case 38: // right_trigger
-                return (double) gp2.right_trigger;
+                return gp2.right_trigger;
         }
         return (0.0);
     }
