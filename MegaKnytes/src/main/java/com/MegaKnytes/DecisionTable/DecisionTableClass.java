@@ -1,6 +1,7 @@
 package com.MegaKnytes.DecisionTable;
 
 
+import com.MegaKnytes.DecisionTable.drivers.DTDriverRegistryClass;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 

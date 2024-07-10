@@ -1,28 +1,21 @@
 package com.MegaKnytes.DecisionTable.editor;
 
-import com.google.gson.JsonObject;
+import com.MegaKnytes.DecisionTable.editor.Message.Message;
+import com.MegaKnytes.DecisionTable.editor.Message.MessageTypes.Init_OpMode;
 import com.qualcomm.ftccommon.FtcEventLoop;
-import com.qualcomm.robotcore.exception.RobotCoreException;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.robocol.Command;
-import com.qualcomm.robotcore.robocol.RobocolParsable;
-
-import org.firstinspires.ftc.ftccommon.external.OnCreateEventLoop;
-import org.firstinspires.ftc.robotcore.internal.network.RobotCoreCommandList;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
 
-public class EditorWebSocket extends NanoWSD.WebSocket{
+public class EditorWebSocket extends NanoWSD.WebSocket {
     private static final Logger LOGGER = Logger.getLogger(EditorWebSocket.class.getName());
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final FtcEventLoop eventLoop;
@@ -30,44 +23,7 @@ public class EditorWebSocket extends NanoWSD.WebSocket{
     public EditorWebSocket(NanoHTTPD.IHTTPSession handshakeRequest, FtcEventLoop eventLoop) {
         super(handshakeRequest);
         this.eventLoop = eventLoop;
-        startAlivePing();
-        startHeartbeat();
     }
-
-    private void startAlivePing() {
-        final Runnable ping = new Runnable() {
-            public void run() {
-                if(isOpen()){
-                    try {
-                        ping("".getBytes());
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, "Error sending ping", e);
-                    }
-                }
-            }
-        };
-        scheduler.scheduleWithFixedDelay(ping, 0, 500, TimeUnit.MILLISECONDS);
-    }
-
-    private void startHeartbeat() {
-        final Runnable ping = new Runnable() {
-            VoltageSensor voltageSensor = eventLoop.getOpModeManager().getActiveOpMode().hardwareMap.voltageSensor.iterator().next();
-            public void run() {
-                JsonObject ping = new JsonObject();
-                ping.addProperty("batteryLevel", voltageSensor.getVoltage());
-                ping.addProperty("runningOpMode", eventLoop.getOpModeManager().getActiveOpModeName());
-                if(isOpen()){
-                    try {
-                        ping(ping.toString().getBytes());
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, "Error sending ping", e);
-                    }
-                }
-            }
-        };
-        scheduler.scheduleWithFixedDelay(ping, 0, 5000, TimeUnit.MILLISECONDS);
-    }
-
 
 
     @Override
@@ -88,18 +44,28 @@ public class EditorWebSocket extends NanoWSD.WebSocket{
 
     @Override
     protected void onMessage(NanoWSD.WebSocketFrame message) {
-        LOGGER.log(Level.INFO, "Received message: " + Arrays.toString(message.getBinaryPayload()));
-        try {
-            this.send("Ping");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Message parsedMessage = DTPEditor.GSON.fromJson(message.getTextPayload(), Message.class);
+
+        switch (parsedMessage.getType()) {
+            case STOP_OPMODE:
+                eventLoop.getOpModeManager().requestOpModeStop(eventLoop.getOpModeManager().getActiveOpMode());
+                break;
+            case START_OPMODE:
+                eventLoop.getOpModeManager().startActiveOpMode();
+                break;
+            case INIT_OPMODE:
+                eventLoop.getOpModeManager().initOpMode(((Init_OpMode) parsedMessage).getOpModeName());
+                break;
+            default:
+                LOGGER.log(Level.WARNING, "Unknown message type: " + parsedMessage.getType());
+                LOGGER.log(Level.WARNING, "Message: " + message.getTextPayload());
+                break;
         }
     }
 
     @Override
     protected void onPong(NanoWSD.WebSocketFrame pong) {
-        LOGGER.log(Level.INFO, "Received pong: " + Arrays.toString(pong.getBinaryPayload()));
-        pong.getOpCode();
+        LOGGER.log(Level.FINE, "Received pong: " + Arrays.toString(pong.getBinaryPayload()));
     }
 
     @Override
@@ -109,6 +75,13 @@ public class EditorWebSocket extends NanoWSD.WebSocket{
             LOGGER.log(Level.INFO, "SocketTimeoutException occurred. Closing connection.");
             try {
                 this.close(NanoWSD.WebSocketFrame.CloseCode.AbnormalClosure, "Timeout occurred", false);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Error closing EditorWebSocket connection", e);
+            }
+        } else {
+            LOGGER.log(Level.SEVERE, "Unknown exception occurred. Closing connection", exception);
+            try {
+                this.close(NanoWSD.WebSocketFrame.CloseCode.InternalServerError, "Unknown error occurred", false);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error closing EditorWebSocket connection", e);
             }

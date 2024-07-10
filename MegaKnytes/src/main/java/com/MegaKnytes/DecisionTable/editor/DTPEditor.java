@@ -1,17 +1,28 @@
 package com.MegaKnytes.DecisionTable.editor;
 
-import static com.MegaKnytes.DecisionTable.editor.WebFileHandler.handleUpload;
-import static com.MegaKnytes.DecisionTable.editor.WebServerHandler.bindWebServer;
+import static com.MegaKnytes.DecisionTable.editor.WebHandler.bindWebServer;
+import static com.MegaKnytes.DecisionTable.editor.WebHandler.handleUpload;
 
 import android.content.Context;
 
+import com.MegaKnytes.DecisionTable.drivers.DriverAnnotationProcessor;
+import com.MegaKnytes.DecisionTable.editor.Message.Message;
+import com.MegaKnytes.DecisionTable.editor.Message.MessageDeserializer;
+import com.MegaKnytes.DecisionTable.interfaces.InterfaceImplementationProcessor;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.qualcomm.ftccommon.FtcEventLoop;
+import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeManager;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import com.qualcomm.robotcore.util.WebHandlerManager;
 
 import org.firstinspires.ftc.ftccommon.external.OnCreateEventLoop;
 import org.firstinspires.ftc.ftccommon.external.OnDestroy;
 import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
+import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,12 +32,17 @@ import java.util.logging.Logger;
 import fi.iki.elonen.NanoWSD;
 
 public class DTPEditor {
+    public static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(Message.class, new MessageDeserializer())
+            .serializeNulls()
+            .create();
     private static final Logger LOGGER = Logger.getLogger(DTPEditor.class.getName());
-
     private static DTPEditor instance;
+    private static Context context;
     private final NanoWSD server;
-    private ArrayList<Class<?>> driverClasses;
+    private ArrayList<Class<?>> interfaceClasses;
     private FtcEventLoop eventLoop;
+
 
     public DTPEditor(Context context) {
         server = new NanoWSD(11093) {
@@ -44,7 +60,7 @@ public class DTPEditor {
                             Arrays.toString(context.fileList()));
                 } else if (session.getMethod() == Method.GET && session.getUri().equals("/drivers/list")) {
                     return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
-                            driverClasses.toString());
+                            String.valueOf(DriverAnnotationProcessor.getClassesWithAnnotation(context)));
                 } else {
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Method not allowed");
                 }
@@ -54,7 +70,7 @@ public class DTPEditor {
 
     @WebHandlerRegistrar
     public static void attachWebUI(Context context, WebHandlerManager manager) {
-        bindWebServer(context, manager);
+        bindWebServer(manager);
     }
 
     @OnCreateEventLoop
@@ -62,13 +78,41 @@ public class DTPEditor {
         if (instance == null) {
             instance = new DTPEditor(context);
             instance.eventLoop = eventLoop;
-            instance.driverClasses = DriverAnnotationProcessor.getClassesWithAnnotation(context);
+            DTPEditor.context = context;
+            instance.interfaceClasses = InterfaceImplementationProcessor.getClassesWithInterface(context);
+            LOGGER.log(Level.INFO, "DTPEditor initialized with " + instance.interfaceClasses.size() + " interfaces");
+        } else {
+            LOGGER.log(Level.WARNING, "DTPEditor already initialized");
         }
         try {
-            instance.server.start();
+            instance.server.start(-1);
             LOGGER.log(Level.INFO, "Websocket handler started on port " + instance.server.getListeningPort());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error starting websocket handler", e);
+        }
+    }
+
+    @OpModeRegistrar
+    public static void registerOpModes(AnnotatedOpModeManager opModeManager) {
+        FileInputStream fis;
+        for (String fileName : context.fileList()) {
+            try {
+                fis = context.openFileInput(fileName);
+                FileInputStream finalFis = fis;
+                opModeManager.register(new OpModeMeta.Builder()
+                        .setName(fileName)
+                        .setFlavor(OpModeMeta.Flavor.TELEOP)
+                        .setSource(OpModeMeta.Source.EXTERNAL_LIBRARY)
+                        .setGroup("DecisionTable")
+                        .build(), new LinearOpMode() {
+                    @Override
+                    public void runOpMode() throws InterruptedException {
+                        String DTPContents;
+                    }
+                });
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Error opening file", e);
+            }
         }
     }
 

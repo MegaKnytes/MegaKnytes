@@ -1,6 +1,8 @@
-package com.MegaKnytes.DecisionTable.editor;
+package com.MegaKnytes.DecisionTable.drivers;
 
 import android.content.Context;
+
+import com.MegaKnytes.DecisionTable.editor.DTPEditor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class DriverAnnotationProcessor {
                 }
                 try {
                     Class<?> configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
-                    if (configClass.isAnnotationPresent(Driver.class)) {
+                    if (configClass.isAnnotationPresent(DTPDriver.class)) {
                         LOGGER.log(Level.INFO, "Found config class: " + configClass.getName());
                         driverClasses.add(configClass);
                     }
