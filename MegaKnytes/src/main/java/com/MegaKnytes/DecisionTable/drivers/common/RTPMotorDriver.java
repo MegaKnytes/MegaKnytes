@@ -1,6 +1,5 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -9,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * This driver will initialize a DCMotor in RUN_TO_POSITION mode.
  */
 
-@DTPDriver
 public class RTPMotorDriver {
 
     static final double VELOCITY = 2000.0;

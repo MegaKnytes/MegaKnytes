@@ -1,10 +1,8 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.MegaKnytes.DecisionTable.drivers.Driver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-@DTPDriver
 public class KnyteVisionDriver extends Driver {
 
     @Override

@@ -5,10 +5,10 @@ plugins {
 }
 
 dependencies {
-    api 'org.firstinspires.ftc:RobotServer:9.1.0'
-    api 'org.firstinspires.ftc:RobotCore:9.1.0'
-    api 'org.firstinspires.ftc:Hardware:9.1.0'
-    api 'org.firstinspires.ftc:FtcCommon:9.1.0'
+    api 'org.firstinspires.ftc:RobotServer:9.2.0'
+    api 'org.firstinspires.ftc:RobotCore:9.2.0'
+    api 'org.firstinspires.ftc:Hardware:9.2.0'
+    api 'org.firstinspires.ftc:FtcCommon:9.2.0'
 
     api 'org.openftc:easyopencv:1.7.2'
 
@@ -51,16 +51,14 @@ android {
 
 node {
     nodeProjectDir = file("editor")
+    download = true;
 }
 
 tasks.register('generateStaticBuild', NpxTask) {
     dependsOn npmInstall
     command = 'react-scripts'
     args = ['build']
-    inputs.files('editor/package.json', 'editor/package-lock.json')
-    inputs.dir("editor/public")
-    inputs.dir("editor/src")
-    inputs.dir(fileTree("editor/node_modules").exclude(".cache"))
+    inputs.dir(fileTree("editor/").exclude("node_modules/.cache"))
     outputs.dir('src/main/assets/editor')
 }
 

@@ -28,7 +28,7 @@ public class DriverAnnotationProcessor {
                 }
                 try {
                     Class<?> configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
-                    if (configClass.isAnnotationPresent(DTPDriver.class)) {
+                    if (configClass.isInstance(Driver.class)) {
                         LOGGER.log(Level.INFO, "Found config class: " + configClass.getName());
                         driverClasses.add(configClass);
                     }

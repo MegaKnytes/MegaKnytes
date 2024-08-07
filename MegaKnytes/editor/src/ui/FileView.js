@@ -8,6 +8,10 @@ import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRou
 import FileCard from "./FileCard";
 
 export default function FileView() {
+  const handleMenuClick = () => {
+    console.log("Menu clicked");
+  };
+
   return (
     <Box className="container">
       <Toolbar />

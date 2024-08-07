@@ -44,6 +44,12 @@
     justify-content: center;
 }
 
+.card-menu-button{
+    align-self: flex-end;
+    margin-left: auto;
+    margin-right: 0%;
+}
+
 .new-file-button{
     align-self: flex-end;
     width: 150px;

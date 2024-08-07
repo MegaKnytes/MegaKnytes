@@ -1,7 +1,6 @@
 package com.MegaKnytes.DecisionTable.editor;
 
 import com.MegaKnytes.DecisionTable.editor.Message.Message;
-import com.MegaKnytes.DecisionTable.editor.Message.MessageTypes.Init_OpMode;
 import com.qualcomm.ftccommon.FtcEventLoop;
 
 import java.io.IOException;
@@ -44,22 +43,10 @@ public class EditorWebSocket extends NanoWSD.WebSocket {
 
     @Override
     protected void onMessage(NanoWSD.WebSocketFrame message) {
-        Message parsedMessage = DTPEditor.GSON.fromJson(message.getTextPayload(), Message.class);
-
-        switch (parsedMessage.getType()) {
-            case STOP_OPMODE:
-                eventLoop.getOpModeManager().requestOpModeStop(eventLoop.getOpModeManager().getActiveOpMode());
-                break;
-            case START_OPMODE:
-                eventLoop.getOpModeManager().startActiveOpMode();
-                break;
-            case INIT_OPMODE:
-                eventLoop.getOpModeManager().initOpMode(((Init_OpMode) parsedMessage).getOpModeName());
-                break;
-            default:
-                LOGGER.log(Level.WARNING, "Unknown message type: " + parsedMessage.getType());
-                LOGGER.log(Level.WARNING, "Message: " + message.getTextPayload());
-                break;
+        try {
+            send(MessageHandler.handleMessage(eventLoop, DTPEditor.GSON.fromJson(message.getTextPayload(), Message.class)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

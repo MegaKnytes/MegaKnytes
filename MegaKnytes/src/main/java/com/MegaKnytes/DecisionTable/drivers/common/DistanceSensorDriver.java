@@ -1,13 +1,11 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.MegaKnytes.DecisionTable.drivers.Driver;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@DTPDriver
 public class DistanceSensorDriver extends Driver {
 
     boolean[] isInitialized;

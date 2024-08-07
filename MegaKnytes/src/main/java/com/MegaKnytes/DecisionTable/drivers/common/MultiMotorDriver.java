@@ -1,6 +1,5 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * can make each driver very unique.
  */
 
-@DTPDriver
 public class MultiMotorDriver {
 
     // number of IO entries for this driver

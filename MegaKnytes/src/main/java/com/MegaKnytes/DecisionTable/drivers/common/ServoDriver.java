@@ -1,6 +1,5 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.hardware.Servo;
  * can make each driver very unique.
  */
 
-@DTPDriver
 public class ServoDriver {
 
     // number of IO entries for this driver

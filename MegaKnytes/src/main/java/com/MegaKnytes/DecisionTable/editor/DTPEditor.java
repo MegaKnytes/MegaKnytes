@@ -8,7 +8,6 @@ import android.content.Context;
 import com.MegaKnytes.DecisionTable.drivers.DriverAnnotationProcessor;
 import com.MegaKnytes.DecisionTable.editor.Message.Message;
 import com.MegaKnytes.DecisionTable.editor.Message.MessageDeserializer;
-import com.MegaKnytes.DecisionTable.interfaces.InterfaceImplementationProcessor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualcomm.ftccommon.FtcEventLoop;
@@ -26,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +40,6 @@ public class DTPEditor {
     private static DTPEditor instance;
     private static Context context;
     private final NanoWSD server;
-    private ArrayList<Class<?>> interfaceClasses;
     private FtcEventLoop eventLoop;
 
 
@@ -55,6 +54,31 @@ public class DTPEditor {
             public Response serveHttp(IHTTPSession session) {
                 if (session.getMethod() == Method.POST && session.getUri().equals("/file/upload")) {
                     return handleUpload(session, context);
+                } else if (session.getMethod() == Method.DELETE && session.getUri().equals("/file")) {
+                    try {
+                        List<String> files = session.getParameters().get("file");
+                        assert files != null;
+                        files.forEach(context::deleteFile);
+                        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "File deleted");
+                    } catch (Exception e) {
+                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Error deleting file");
+                    }
+                } else if (session.getMethod() == Method.GET && session.getUri().equals("/file")) {
+                    try {
+                        List<String> files = session.getParameters().get("file");
+                        assert files != null;
+                        FileInputStream fis = context.openFileInput(files.get(0));
+                        assert fis != null;
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        StringBuilder fileContent = new StringBuilder();
+                        while ((bytesRead = fis.read(buffer)) != -1) {
+                            fileContent.append(new String(buffer, 0, bytesRead));
+                        }
+                        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, fileContent.toString());
+                    } catch (Exception e) {
+                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Error reading file");
+                    }
                 } else if (session.getMethod() == Method.GET && session.getUri().equals("/file/list")) {
                     return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
                             Arrays.toString(context.fileList()));
@@ -79,8 +103,6 @@ public class DTPEditor {
             instance = new DTPEditor(context);
             instance.eventLoop = eventLoop;
             DTPEditor.context = context;
-            instance.interfaceClasses = InterfaceImplementationProcessor.getClassesWithInterface(context);
-            LOGGER.log(Level.INFO, "DTPEditor initialized with " + instance.interfaceClasses.size() + " interfaces");
         } else {
             LOGGER.log(Level.WARNING, "DTPEditor already initialized");
         }
@@ -107,7 +129,6 @@ public class DTPEditor {
                         .build(), new LinearOpMode() {
                     @Override
                     public void runOpMode() throws InterruptedException {
-                        String DTPContents;
                     }
                 });
             } catch (IOException e) {
