@@ -5,7 +5,7 @@ import static com.MegaKnytes.DecisionTable.editor.WebHandler.handleUpload;
 
 import android.content.Context;
 
-import com.MegaKnytes.DecisionTable.drivers.DriverAnnotationProcessor;
+import com.MegaKnytes.DecisionTable.drivers.DTDriverRegistry;
 import com.MegaKnytes.DecisionTable.editor.Message.Message;
 import com.MegaKnytes.DecisionTable.editor.Message.MessageDeserializer;
 import com.google.gson.Gson;
@@ -23,7 +23,6 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -84,7 +83,7 @@ public class DTPEditor {
                             Arrays.toString(context.fileList()));
                 } else if (session.getMethod() == Method.GET && session.getUri().equals("/drivers/list")) {
                     return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
-                            String.valueOf(DriverAnnotationProcessor.getClassesWithAnnotation(context)));
+                            String.valueOf(DTDriverRegistry.getClassesWithAnnotation(context)));
                 } else {
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Method not allowed");
                 }

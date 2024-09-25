@@ -1,79 +1,75 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.Driver;
+import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * FanDriver is provided as a simple example of adding a device driver for the decision table processor.
- * Each driver will consist of basically the same functions, however, how you process the inputs provided
- * can make each driver very unique.
+ * Driver for controlling a CRServo.
  */
+public class CRServoDriver implements DTDriver {
+    private CRServo crServo;
 
-public class CRServoDriver extends Driver {
+    @Override
+    public void setup(OpMode opMode, String deviceName, Map<String, Object> deviceOptions) {
+        crServo = opMode.hardwareMap.crservo.get(deviceName);
 
-    // number of IO entries for this driver
-    //int numMotorsIO;
-
-
-    // because the init method is called for each IO entry, we only want the motor to be initialized once.
-    // this flag is set to true once the first call to init is complete
-    boolean[] isInitialized;
-
-    int numMotors;
-    CRServo[] motors;
-
-
-    public CRServoDriver(int numMotors) {
-        this.numMotors = numMotors;
-        this.motors = new CRServo[numMotors];
-
-        int i = 0;
-        this.isInitialized = new boolean[numMotors];
-        for (i = 0; i < numMotors; i++) {
-            isInitialized[i] = false;
+        try {
+            setDirection(deviceOptions);
+            setInitialValue(deviceOptions);
+        } catch (NullPointerException e){
+            throw new RuntimeException("This should not have happened, something is wrong");
         }
     }
 
-
-    /**
-     * @param channel -- channel could be the physical port of the device but at this point,
-     *                we're thinking we could use channel as sort of a case identifier to know
-     *                which type of get we want to use if there is more than one (i.e. getVelocity, getCurrentPosition, etc)
-     */
-
-    @Override
-    public double get(int channel) {
-        return motors[channel].getPower();
-    }
-
-    /**
-     * @param channel -- channel could be the physical port of the device but at this point,
-     *                we're thinking we could use channel as sort of a case identifier to know
-     *                which type of set we want to use if there is more than one (i.e. setVelocity, setPower, setTargetPosition)
-     */
-    @Override
-    public void set(int channel, double value) {
-        motors[channel].setPower(value);
-    }
-
-    /**
-     * Initializes the device(s) for this device driver.
-     *
-     * @param IOName
-     * @param channel    - could be used to identify how the motor should be initialized.
-     * @param initVal
-     * @param deviceName
-     * @param hwMap
-     */
-
-    @Override
-    public void init(String IOName, int channel, double initVal, String deviceName, HardwareMap hwMap) {
-        if (!isInitialized[channel]) {
-            motors[channel] = hwMap.get(CRServo.class, deviceName);
-            isInitialized[channel] = true;
+    private void setDirection(Map<String, Object> deviceOptions) {
+        switch ((String) Objects.requireNonNull(deviceOptions.getOrDefault("DIRECTION", ""))) {
+            case "REVERSED":
+                crServo.setDirection(DcMotorSimple.Direction.REVERSE);
+                break;
+            case "FORWARD":
+            default:
+                crServo.setDirection(DcMotorSimple.Direction.FORWARD);
+                break;
         }
     }
 
+    private void setInitialValue(Map<String, Object> deviceOptions) {
+        Double initialValue = (Double) deviceOptions.getOrDefault("INITIAL_VALUE", 0.0);
+        crServo.setPower(Objects.requireNonNull(initialValue));
+    }
+
+    @Override
+    public void set(Map<String, Object> values) {
+        if (values.containsKey("POWER")) {
+            Object powerValue = values.get("POWER");
+            if (powerValue instanceof Double) {
+                crServo.setPower((Double) powerValue);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> get(List<String> values) {
+        Map<String, Object> response = new HashMap<>();
+
+        for (String value : values) {
+            switch (value.toUpperCase()) {
+                case "POWER":
+                    response.put("POWER", crServo.getPower());
+                    break;
+                default:
+                    // Handle unknown values if necessary
+                    break;
+            }
+        }
+
+        return response;
+    }
 }
-

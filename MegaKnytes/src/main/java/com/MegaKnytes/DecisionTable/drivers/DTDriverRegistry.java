@@ -12,13 +12,13 @@ import java.util.logging.Logger;
 
 import dalvik.system.DexFile;
 
-public class DriverAnnotationProcessor {
+public class DTDriverRegistry {
 
-    private static final Logger LOGGER = Logger.getLogger(DriverAnnotationProcessor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DTDriverRegistry.class.getName());
 
 
-    public static ArrayList<Class<?>> getClassesWithAnnotation(Context context) {
-        ArrayList<Class<?>> driverClasses = new ArrayList<>();
+    public static ArrayList<Class> getClassesWithAnnotation(Context context) {
+        ArrayList<Class> driverClasses = new ArrayList<>();
         try {
             DexFile dexFile = new DexFile(context.getPackageCodePath());
 
@@ -27,8 +27,8 @@ public class DriverAnnotationProcessor {
                     continue;
                 }
                 try {
-                    Class<?> configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
-                    if (configClass.isInstance(Driver.class)) {
+                    Class configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
+                    if (configClass.isInstance(DTDriver.class)) {
                         LOGGER.log(Level.INFO, "Found config class: " + configClass.getName());
                         driverClasses.add(configClass);
                     }

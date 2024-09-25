@@ -1,7 +1,7 @@
 package com.MegaKnytes.DecisionTable;
 
 
-import com.MegaKnytes.DecisionTable.drivers.DTDriverRegistryClass;
+//import com.MegaKnytes.DecisionTable.drivers.DTDriverRegistryClass;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -34,7 +34,7 @@ public class DecisionTableClass {
     int numInputs, numOutputs, numRows, maxInputOperators, maxOutputOperators;
     int[] dtDebugRow;
     DecisionTableCellClass[][][] decisionCells, outputCells;
-    DTDriverRegistryClass DTDriverRegistry;
+    //DTDriverRegistryClass DTDriverRegistry;
 
     public int mapOperator(String operatorString) {
         int i;
@@ -91,20 +91,20 @@ public class DecisionTableClass {
 
         // TODO:  ADDING DRIVER: add the new counter to the paramter list for the DTDriverRegistryClass constructor.
         //        Make sure the order matches what you add in the DTDRiverRegistryClass
-        DTDriverRegistry = new DTDriverRegistryClass(internalCount, gamepadCount, timerCount, dcMotorCount,
-                motorCount, crServoCount, rtpMotorCount, servoCount, mecanumCount, distanceSensorCount,
-                knyteVisionCount, numInputs, numOutputs);
+        //DTDriverRegistry = new DTDriverRegistryClass(internalCount, gamepadCount, timerCount, dcMotorCount,
+        //        motorCount, crServoCount, rtpMotorCount, servoCount, mecanumCount, distanceSensorCount,
+        //        knyteVisionCount, numInputs, numOutputs);
 
         // Read IODefinitions
         tempString = scan.nextLine();        // Skip Abstract description
 
-        for (ioRegistryIndex = 0; ioRegistryIndex < DTDriverRegistry.numIODefs; ioRegistryIndex++) {
-            IOName = scan.next();
-            channel = scan.nextInt();
-            initVal = scan.nextDouble();
-            deviceName = scan.next();
-            DTDriverRegistry.registerIODef(IOName, channel, initVal, deviceName, hwMap, gp1, gp2);
-        }
+        //for (ioRegistryIndex = 0; ioRegistryIndex < DTDriverRegistry.numIODefs; ioRegistryIndex++) {
+        //    IOName = scan.next();
+        //    channel = scan.nextInt();
+        //    initVal = scan.nextDouble();
+        //    deviceName = scan.next();
+        //    DTDriverRegistry.registerIODef(IOName, channel, initVal, deviceName, hwMap, gp1, gp2);
+        //}
         // Read Number of Rows
         numRows = scan.nextInt();
 
@@ -181,11 +181,11 @@ public class DecisionTableClass {
 
     public void readIO() {
         for (int i = 0; i < numInputs; i++) {
-            inputBuffer[i] = DTDriverRegistry.IORegistryBrokerGet(inputRegistryList[i]);
+            //inputBuffer[i] = DTDriverRegistry.IORegistryBrokerGet(inputRegistryList[i]);
         }
 
         for (int o = 0; o < numOutputs; o++) {
-            outputInitialBuffer[o] = DTDriverRegistry.IORegistryBrokerGet(outputRegistryList[o]);
+            //outputInitialBuffer[o] = DTDriverRegistry.IORegistryBrokerGet(outputRegistryList[o]);
         }
     }
 
@@ -193,7 +193,7 @@ public class DecisionTableClass {
 
         for (int o = 0; o < numOutputs; o++) {
             if (outputSet[o] == 1) {
-                DTDriverRegistry.IORegistryBrokerSet(outputRegistryList[o], outputBuffer[o]);
+                //DTDriverRegistry.IORegistryBrokerSet(outputRegistryList[o], outputBuffer[o]);
             }
         }
     }
@@ -209,7 +209,7 @@ public class DecisionTableClass {
                     if (decisionCells[row][inputCol][cellOperator].operator == -1) {
                         cellComplete = 1;
                     } else {
-                        targetValue = DTDriverRegistry.IORegistryBrokerIndirection(decisionCells[row][inputCol][cellOperator].indirection, decisionCells[row][inputCol][cellOperator].value);
+                        targetValue = 0.0;//DTDriverRegistry.IORegistryBrokerIndirection(decisionCells[row][inputCol][cellOperator].indirection, decisionCells[row][inputCol][cellOperator].value);
                         switch (decisionCells[row][inputCol][cellOperator].operator) {
                             case 0: // =
                                 if (inputBuffer[inputCol] != targetValue) {
@@ -263,7 +263,7 @@ public class DecisionTableClass {
                         if (outputCells[row][outputCol][cellOperator].operator == -1) {
                             cellComplete = 1;
                         } else {
-                            targetValue = DTDriverRegistry.IORegistryBrokerIndirection(outputCells[row][outputCol][cellOperator].indirection, outputCells[row][outputCol][cellOperator].value);
+                            targetValue = 0.0;//DTDriverRegistry.IORegistryBrokerIndirection(outputCells[row][outputCol][cellOperator].indirection, outputCells[row][outputCol][cellOperator].value);
                             switch (outputCells[row][outputCol][cellOperator].operator) {
                                 case 0: // =
                                     outputBuffer[outputCol] = targetValue;

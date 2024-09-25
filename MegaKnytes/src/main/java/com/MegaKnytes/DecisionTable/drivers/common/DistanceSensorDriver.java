@@ -1,53 +1,62 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.Driver;
+import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class DistanceSensorDriver extends Driver {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-    boolean[] isInitialized;
-    int numSensors;
-    DistanceSensor[] Sensors;
 
+public class DistanceSensorDriver implements DTDriver {
+    private DistanceSensor sensor;
+    private DistanceUnit unit;
 
-    public DistanceSensorDriver(int numSensors) {
-
-        this.numSensors = numSensors;
-        Sensors = new DistanceSensor[numSensors];
-
-        //for (i = 0; i < numSensors; i++) {
-        //   Sensors[i] = new DistanceSensor;
-        //}
-
-        int i = 0;
-        this.isInitialized = new boolean[numSensors];
-        for (i = 0; i < numSensors; i++) {
-            isInitialized[i] = false;
+    @Override
+    public void setup(OpMode opMode, String deviceName, Map<String, Object> deviceOptions) {
+        sensor = opMode.hardwareMap.get(DistanceSensor.class, deviceName);
+        switch ((DistanceUnit) Objects.requireNonNull(deviceOptions.getOrDefault("DISTANCE_UNIT", DistanceUnit.INCH))) {
+            case MM:
+                unit = DistanceUnit.MM;
+                break;
+            case METER:
+                unit = DistanceUnit.METER;
+                break;
+            case CM:
+                unit = DistanceUnit.CM;
+                break;
+            case INCH:
+            default:
+                unit = DistanceUnit.INCH;
+                break;
         }
     }
 
+
     @Override
-    public double get(int channel) {
-        if ((channel >= 0) && (channel < numSensors)) {
-
-            return Sensors[channel].getDistance(DistanceUnit.INCH);
-
-        }
-        return (-1.0);
+    public void set(Map<String, Object> values) {
+        // Nothing to see here
     }
 
     @Override
-    public void set(int channel, double value) {
-    }
+    public Map<String, Object> get(List<String> values) {
+        Map<String, Object> response = new HashMap<>();
 
-    @Override
-    public void init(String IOName, int channel, double initVal, String deviceName, HardwareMap hwMap) {
-        if (!isInitialized[channel]) {
-            Sensors[channel] = hwMap.get(DistanceSensor.class, deviceName);
-            isInitialized[channel] = true;
+        for (String value : values) {
+            switch (value.toUpperCase()) {
+                case "DISTANCE":
+                    response.put("DISTANCE", sensor.getDistance(unit));
+                    break;
+                default:
+                    // Handle unknown values if necessary
+                    break;
+            }
         }
+
+        return response;
     }
 }

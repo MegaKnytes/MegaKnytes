@@ -1,34 +1,26 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-public class InternalVariableDriver {
-    int numInternalVariables;
-    double[] internalVariables;
+import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-    public InternalVariableDriver(int numInternalVariables) {
-        int i;
+import java.util.List;
+import java.util.Map;
 
-        this.numInternalVariables = numInternalVariables;
-        internalVariables = new double[numInternalVariables];
+public class InternalVariableDriver implements DTDriver {
+    private Map<String, Object> internal;
 
-        for (i = 0; i < numInternalVariables; i++) {
-            internalVariables[i] = 0.0;
-        }
+    @Override
+    public void setup(OpMode opMode, String deviceName, Map<String, Object> deviceOptions) {
+        // Nothing to see here...
     }
 
-    public double get(int channel) {
-        if ((channel >= 0) && (channel < numInternalVariables)) {
-            return (internalVariables[channel]);
-        }
-        return (-1.0);
+    @Override
+    public void set(Map<String, Object> values) {
+        internal = values;
     }
 
-    public void set(int channel, double value) {
-        if ((channel >= 0) && (channel < numInternalVariables)) {
-            internalVariables[channel] = value;
-        }
-    }
-
-    public void init(String IOName, int channel, double initVal) {
-        internalVariables[channel] = initVal;
+    @Override
+    public Map<String, Object> get(List<String> values) {
+        return internal;
     }
 }
