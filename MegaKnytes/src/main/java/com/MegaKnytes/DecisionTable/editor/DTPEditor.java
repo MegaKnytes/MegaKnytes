@@ -5,6 +5,7 @@ import static com.MegaKnytes.DecisionTable.editor.WebHandler.handleUpload;
 
 import android.content.Context;
 
+import com.MegaKnytes.DecisionTable.drivers.DTDriver;
 import com.MegaKnytes.DecisionTable.drivers.DTDriverRegistry;
 import com.MegaKnytes.DecisionTable.editor.Message.Message;
 import com.MegaKnytes.DecisionTable.editor.Message.MessageDeserializer;
@@ -37,7 +38,6 @@ public class DTPEditor {
             .create();
     private static final Logger LOGGER = Logger.getLogger(DTPEditor.class.getName());
     private static DTPEditor instance;
-    private static Context context;
     private final NanoWSD server;
     private FtcEventLoop eventLoop;
 
@@ -83,7 +83,7 @@ public class DTPEditor {
                             Arrays.toString(context.fileList()));
                 } else if (session.getMethod() == Method.GET && session.getUri().equals("/drivers/list")) {
                     return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT,
-                            String.valueOf(DTDriverRegistry.getClassesWithAnnotation(context)));
+                            String.valueOf(DTDriverRegistry.getClassesWithInstanceOf(context, DTDriver.class)));
                 } else {
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Method not allowed");
                 }
@@ -101,7 +101,6 @@ public class DTPEditor {
         if (instance == null) {
             instance = new DTPEditor(context);
             instance.eventLoop = eventLoop;
-            DTPEditor.context = context;
         } else {
             LOGGER.log(Level.WARNING, "DTPEditor already initialized");
         }
@@ -110,29 +109,6 @@ public class DTPEditor {
             LOGGER.log(Level.INFO, "Websocket handler started on port " + instance.server.getListeningPort());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error starting websocket handler", e);
-        }
-    }
-
-    @OpModeRegistrar
-    public static void registerOpModes(AnnotatedOpModeManager opModeManager) {
-        FileInputStream fis;
-        for (String fileName : context.fileList()) {
-            try {
-                fis = context.openFileInput(fileName);
-                FileInputStream finalFis = fis;
-                opModeManager.register(new OpModeMeta.Builder()
-                        .setName(fileName)
-                        .setFlavor(OpModeMeta.Flavor.TELEOP)
-                        .setSource(OpModeMeta.Source.EXTERNAL_LIBRARY)
-                        .setGroup("DecisionTable")
-                        .build(), new LinearOpMode() {
-                    @Override
-                    public void runOpMode() throws InterruptedException {
-                    }
-                });
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error opening file", e);
-            }
         }
     }
 

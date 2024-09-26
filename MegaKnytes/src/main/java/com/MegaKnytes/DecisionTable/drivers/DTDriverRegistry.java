@@ -3,34 +3,37 @@ package com.MegaKnytes.DecisionTable.drivers;
 import android.content.Context;
 
 import com.MegaKnytes.DecisionTable.editor.DTPEditor;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dalvik.system.DexFile;
 
+@TeleOp
 public class DTDriverRegistry {
 
     private static final Logger LOGGER = Logger.getLogger(DTDriverRegistry.class.getName());
 
 
-    public static ArrayList<Class> getClassesWithAnnotation(Context context) {
-        ArrayList<Class> driverClasses = new ArrayList<>();
+    public static HashMap<String, Class<?>> getClassesWithInstanceOf(Context context, Class<?> classObject) {
+        HashMap<String, Class<?>> driverClasses = new HashMap<>();
         try {
-            DexFile dexFile = new DexFile(context.getPackageCodePath());
+            List<String> classNames = new ArrayList<>(Collections.list(new DexFile(context.getPackageCodePath()).entries()));
 
-            for (String className : Collections.list(dexFile.entries())) {
-                if (!className.startsWith("org.firstinspires") && !className.startsWith("com.MegaKnytes")) {
-                    continue;
-                }
+            for (String className : classNames) {
                 try {
-                    Class configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
-                    if (configClass.isInstance(DTDriver.class)) {
-                        LOGGER.log(Level.INFO, "Found config class: " + configClass.getName());
-                        driverClasses.add(configClass);
+                    Class<?> configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
+                    if (configClass.isInstance(classObject)) {
+                        LOGGER.log(Level.INFO, "Found Driver: " + configClass.getName());
+                        driverClasses.put(configClass.getSimpleName(), configClass);
                     }
                 } catch (ClassNotFoundException ignored) {
                 }
