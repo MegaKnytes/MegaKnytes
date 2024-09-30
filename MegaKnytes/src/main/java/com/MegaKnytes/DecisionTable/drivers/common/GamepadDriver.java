@@ -1,6 +1,7 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
+import com.MegaKnytes.DecisionTable.utils.ConfigurationException;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -9,17 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class GamepadDriver implements DTDriver {
+public class GamepadDriver implements DTPDriver {
     private Gamepad gamepad;
 
     @Override
     public void setup(OpMode opMode, String deviceName, Map<String, Object> deviceOptions) {
-        if(Objects.equals(deviceName, "Gamepad1")){
+        Object hardwareMap = deviceOptions.getOrDefault("HardwareMap", "");
+        assert hardwareMap != null;
+        if (hardwareMap.equals("Gamepad1")) {
             gamepad = opMode.gamepad1;
-        } else if (Objects.equals(deviceName, "Gamepad2")){
+        } else if (hardwareMap.equals("Gamepad2")) {
             gamepad = opMode.gamepad2;
         } else {
-            throw new RuntimeException("deviceName must be one of Gamepad1/Gamepad2");
+            throw new ConfigurationException("Gamepads should have a HardwareMap value of Gamepad1 or Gamepad2. Please check your configuration");
         }
     }
 

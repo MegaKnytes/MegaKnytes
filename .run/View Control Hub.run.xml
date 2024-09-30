@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="View Control Hub" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="scrcpy -Sw -s ff3301469e175bb2" />
+    <option name="SCRIPT_TEXT" value="scrcpy" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />

@@ -2,44 +2,38 @@ package com.MegaKnytes.DecisionTable.drivers;
 
 import android.content.Context;
 
-import com.MegaKnytes.DecisionTable.editor.DTPEditor;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dalvik.system.DexFile;
 
-@TeleOp
+
 public class DTDriverRegistry {
 
     private static final Logger LOGGER = Logger.getLogger(DTDriverRegistry.class.getName());
 
+    public static HashMap<String, Class<? extends DTPDriver>> getClassesWithInstanceOf(Context context, Class<? extends DTPDriver> classObject) {
+        HashMap<String, Class<? extends DTPDriver>> driverClasses = new HashMap<>();
 
-    public static HashMap<String, Class<?>> getClassesWithInstanceOf(Context context, Class<?> classObject) {
-        HashMap<String, Class<?>> driverClasses = new HashMap<>();
         try {
-            List<String> classNames = new ArrayList<>(Collections.list(new DexFile(context.getPackageCodePath()).entries()));
-
-            for (String className : classNames) {
+            DexFile dexFile = new DexFile(context.getPackageCodePath());
+            for (String className : Collections.list(dexFile.entries())) {
                 try {
-                    Class<?> configClass = Class.forName(className, false, DTPEditor.class.getClassLoader());
-                    if (configClass.isInstance(classObject)) {
-                        LOGGER.log(Level.INFO, "Found Driver: " + configClass.getName());
-                        driverClasses.put(configClass.getSimpleName(), configClass);
+                    Class<?> configClass = Class.forName(className, false, DTDriverRegistry.class.getClassLoader());
+                    if (Arrays.asList(configClass.getInterfaces()).contains(DTPDriver.class)) {
+                        //TODO: Fix Unchecked Cast - Working for now
+                        Class<? extends DTPDriver> driverClass = (Class<? extends DTPDriver>) configClass;
+                        driverClasses.put(configClass.getSimpleName(), driverClass);
                     }
-                } catch (ClassNotFoundException ignored) {
+                } catch (ClassNotFoundException e) {
+                    LOGGER.log(Level.SEVERE, "Error while attempting to setup class", e);
                 }
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading classes", e);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error while reading classes", e);
         }
         return driverClasses;
     }

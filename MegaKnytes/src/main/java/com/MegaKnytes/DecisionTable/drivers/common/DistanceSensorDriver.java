@@ -1,6 +1,6 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public class DistanceSensorDriver implements DTDriver {
+public class DistanceSensorDriver implements DTPDriver {
     private DistanceSensor sensor;
     private DistanceUnit unit;
 

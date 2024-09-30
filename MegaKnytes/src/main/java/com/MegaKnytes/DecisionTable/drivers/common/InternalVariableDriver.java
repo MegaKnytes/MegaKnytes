@@ -1,12 +1,12 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.util.List;
 import java.util.Map;
 
-public class InternalVariableDriver implements DTDriver {
+public class InternalVariableDriver implements DTPDriver {
     private Map<String, Object> internal;
 
     @Override

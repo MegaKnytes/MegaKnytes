@@ -1,20 +1,25 @@
 package com.MegaKnytes.DecisionTable.drivers.common;
 
-import com.MegaKnytes.DecisionTable.drivers.DTDriver;
+import com.MegaKnytes.DecisionTable.drivers.DTPDriver;
+import com.MegaKnytes.DecisionTable.utils.ConfigurationException;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.datatype.DatatypeConfigurationException;
 
 /**
  * Driver for controlling a CRServo.
  */
-public class CRServoDriver implements DTDriver {
-    private CRServo crServo;
+public class CRServoDriver implements DTPDriver {
+    private com.qualcomm.robotcore.hardware.CRServo crServo;
+    private static final Logger LOGGER = Logger.getLogger(CRServoDriver.class.getName());
 
     @Override
     public void setup(OpMode opMode, String deviceName, Map<String, Object> deviceOptions) {
@@ -23,8 +28,10 @@ public class CRServoDriver implements DTDriver {
         try {
             setDirection(deviceOptions);
             setInitialValue(deviceOptions);
-        } catch (NullPointerException e){
-            throw new RuntimeException("This should not have happened, something is wrong");
+        } catch (NullPointerException e) {
+            LOGGER.log(Level.SEVERE, "An exception has occurred while initializing device " + deviceName);
+            LOGGER.log(Level.SEVERE, e.toString());
+            throw new ConfigurationException("An exception has occurred while initializing device " + deviceName);
         }
     }
 
