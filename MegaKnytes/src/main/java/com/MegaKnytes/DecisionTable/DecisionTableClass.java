@@ -346,17 +346,17 @@ public class DecisionTableClass {
         telemetry.addData("Say", "Hello MegaKnytes");
         telemetry.update();
 
-        //System.out.println("======> Start executeDT");
+        System.out.println("======> Start executeDT");
 
         Arrays.fill(outputSet, 0);    // Mark outputs as not set in this round
         readIO();
-        //System.out.println("======> after readIO");
+        System.out.println("======> after readIO");
 
         boolean traceFlag = evaluateDecisionTable();
-        //System.out.println("======> after evaluateDecisionTable");
+        System.out.println("======> after evaluateDecisionTable");
 
         writeOutputs();
-        //System.out.println("======> writeOutputs");
+        System.out.println("======> writeOutputs");
 
         if (traceFlag) {
             System.out.print("Inputs: ");
